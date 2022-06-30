@@ -27,6 +27,6 @@ func main() {
 	//server.Route("/user", user)
 	//server.Route("/user/create", createUser)
 	//server.Route("/order", order)
-	server.Route("POST", "/user/signup", SignUp)
+	server.Route(http.MethodGet, "/user/signup", SignUp)
 	server.Start("8090")
 }

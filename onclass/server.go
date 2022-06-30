@@ -6,19 +6,18 @@ import (
 )
 
 type Server interface {
-	Route(method string, pattern string, handleFunc func(ctx *Context))
+	Routable
 	Start(address string) error
 }
 
 // sdkHttpServer based on http library implementation
 type sdkHttpServer struct {
 	Name    string
-	handler *HandlerBasedOnMap
+	handler Handler
 }
 
 func (s *sdkHttpServer) Route(method string, pattern string, handleFunc func(ctx *Context)) {
-	key := s.handler.key(method, pattern)
-	s.handler.handlers[key] = handleFunc
+	s.handler.Route(method, pattern, handleFunc)
 }
 
 func (s *sdkHttpServer) Start(address string) error {
@@ -28,7 +27,8 @@ func (s *sdkHttpServer) Start(address string) error {
 
 func NewHttpServer(name string) Server {
 	return &sdkHttpServer{
-		Name: name,
+		Name:    name,
+		handler: NewHandlerBasedOnMap(),
 	}
 }
 
