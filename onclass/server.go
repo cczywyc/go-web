@@ -32,7 +32,7 @@ func (s *sdkHttpServer) Start(address string) error {
 func NewHttpServer(name string, builders ...FilterBuilder) Server {
 	handler := NewHandlerBasedOnMap()
 	var root Filter = func(c *Context) {
-		handler.ServeHTTP(c.W, c.R)
+		handler.ServerHTTP(c)
 	}
 	for i := len(builders); i >= 0; i-- {
 		b := builders[i]
