@@ -14,6 +14,7 @@ type Server interface {
 type sdkHttpServer struct {
 	Name    string
 	handler Handler
+	root    Filter
 }
 
 func (s *sdkHttpServer) Route(method string, pattern string, handleFunc func(ctx *Context)) {
@@ -21,14 +22,26 @@ func (s *sdkHttpServer) Route(method string, pattern string, handleFunc func(ctx
 }
 
 func (s *sdkHttpServer) Start(address string) error {
-	http.Handle("/", s.handler)
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		c := NewContext(writer, request)
+		s.root(c)
+	})
 	return http.ListenAndServe(address, nil)
 }
 
-func NewHttpServer(name string) Server {
+func NewHttpServer(name string, builders ...FilterBuilder) Server {
+	handler := NewHandlerBasedOnMap()
+	var root Filter = func(c *Context) {
+		handler.ServeHTTP(c.W, c.R)
+	}
+	for i := len(builders); i >= 0; i-- {
+		b := builders[i]
+		root = b(root)
+	}
 	return &sdkHttpServer{
 		Name:    name,
-		handler: NewHandlerBasedOnMap(),
+		handler: handler,
+		root:    root,
 	}
 }
 

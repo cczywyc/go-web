@@ -1,5 +1,6 @@
 package onclass
 
+import "C"
 import (
 	"net/http"
 )
@@ -9,7 +10,7 @@ type Routable interface {
 }
 
 type Handler interface {
-	http.Handler
+	ServerHTTP(c *Context)
 	Routable
 }
 
@@ -23,13 +24,13 @@ func (s *HandlerBasedOnMap) Route(method string, pattern string, handleFunc func
 	s.handlers[key] = handleFunc
 }
 
-func (h *HandlerBasedOnMap) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	key := h.key(request.Method, request.URL.Path)
+func (h *HandlerBasedOnMap) ServerHTTP(c *Context) {
+	key := h.key(c.R.Method, C.R.URL.Path)
 	if handler, ok := h.handlers[key]; ok {
-		handler(NewContext(writer, request))
+		handler(c)
 	} else {
-		writer.WriteHeader(http.StatusNotFound)
-		writer.Write([]byte("Not Found"))
+		c.W.WriteHeader(http.StatusNotFound)
+		c.W.Write([]byte("Not Found"))
 	}
 }
 
