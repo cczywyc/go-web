@@ -6,7 +6,7 @@ import (
 )
 
 type Routable interface {
-	Route(method string, pattern string, handleFunc func(ctx *Context))
+	Route(method string, pattern string, handleFunc handlerFunc)
 }
 
 type Handler interface {
@@ -19,7 +19,7 @@ type HandlerBasedOnMap struct {
 	handlers map[string]func(ctx *Context)
 }
 
-func (s *HandlerBasedOnMap) Route(method string, pattern string, handleFunc func(ctx *Context)) {
+func (s *HandlerBasedOnMap) Route(method string, pattern string, handleFunc handlerFunc) {
 	key := s.key(method, pattern)
 	s.handlers[key] = handleFunc
 }

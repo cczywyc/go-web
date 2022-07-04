@@ -7,6 +7,8 @@ import (
 
 type FilterBuilder func(next Filter) Filter
 
+type handlerFunc func(c *Context)
+
 type Filter func(c *Context)
 
 var _ FilterBuilder = MetricsFilterBuilder
