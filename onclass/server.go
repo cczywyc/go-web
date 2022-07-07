@@ -17,7 +17,7 @@ type sdkHttpServer struct {
 	root    Filter
 }
 
-func (s *sdkHttpServer) Route(method string, pattern string, handleFunc func(ctx *Context)) {
+func (s *sdkHttpServer) Route(method string, pattern string, handleFunc handlerFunc) {
 	s.handler.Route(method, pattern, handleFunc)
 }
 
@@ -31,18 +31,17 @@ func (s *sdkHttpServer) Start(address string) error {
 
 func NewHttpServer(name string, builders ...FilterBuilder) Server {
 	handler := NewHandlerBasedOnMap()
-	var root Filter = func(c *Context) {
-		handler.ServerHTTP(c)
-	}
-	for i := len(builders); i >= 0; i-- {
+	var root Filter = handler.ServerHTTP
+	for i := len(builders) - 1; i >= 0; i-- {
 		b := builders[i]
 		root = b(root)
 	}
-	return &sdkHttpServer{
+	res := &sdkHttpServer{
 		Name:    name,
 		handler: handler,
 		root:    root,
 	}
+	return res
 }
 
 func SignUp(ctx *Context) {
