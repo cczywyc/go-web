@@ -12,7 +12,7 @@ type RouterGroup struct {
 	prefix      string
 	middlewares []HandlerFunc // support middleware
 	parent      *RouterGroup  // support nesting
-	engine      *Engine       // all group share a Engine instance
+	engine      *Engine       // all group share an Engine instance
 }
 
 // Engine implement the interface of ServerHTTP
